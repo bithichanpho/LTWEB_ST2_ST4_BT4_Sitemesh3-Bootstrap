@@ -1,4 +1,4 @@
-# Hướng dân cấu hình Database & Tài khoản đăng nhập
+# Hướng dẫn cấu hình Database & Tài khoản đăng nhập
 
 ## 1. Cấu hình kết nối Database (Persistence)
 
