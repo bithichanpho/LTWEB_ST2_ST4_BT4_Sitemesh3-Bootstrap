@@ -7,21 +7,15 @@ import entity.Category;
 public interface ICategoryDao {
 
 	void insert(Category category);
-
-	int count();
-
-	List<Category> findAll(int page, int pagesize);
-
-	List<Category> searchByName(String catname);
+	void delete(int cateid) throws Exception;
+	void update(Category category);
+	
+	Category findById(int cateid);
+	Category findByCategoryname(String name);
 
 	List<Category> findAll();
+	List<Category> findAll(int page, int pagesize);
+	List<Category> searchByName(String catname);
 
-	Category findById(int cateid);
-
-	void delete(int cateid) throws Exception;
-
-	void update(Category category);
-
-	Category findByCategoryname(String name) throws Exception;
-
+	int count();
 }

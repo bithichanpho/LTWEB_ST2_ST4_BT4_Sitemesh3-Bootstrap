@@ -1,14 +1,9 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.List;
 
-import jakarta.persistence.Table;
-import jakarta.persistence.NamedQuery;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "categories")
@@ -31,6 +26,8 @@ public class Category implements Serializable {
 	@Column(name = "status")
 	private int status;
 
+	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)	
+	private List<Product> products;
 	public Category() {
 		super();
 	}
@@ -73,6 +70,15 @@ public class Category implements Serializable {
 
 	public void setStatus(int status) {
 		this.status = status;
+	}
+	
+
+	public List<Product> getProducts() {
+		return products;
+	}
+
+	public void setProducts(List<Product> products) {
+		this.products = products;
 	}
 
 	@Override

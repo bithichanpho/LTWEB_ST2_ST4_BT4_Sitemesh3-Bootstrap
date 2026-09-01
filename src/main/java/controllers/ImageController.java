@@ -1,54 +1,64 @@
 package controllers;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
+import configs.AppConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet(urlPatterns = "/image/*")
+/**
+ * Servlet nay truoc day KHONG TON TAI trong project (day la 1 trong nhung
+ * nguyen nhan chinh khien anh san pham/danh muc khong bao gio hien thi duoc,
+ * du code JSP da viet dung the <img src="${pageContext.request.contextPath}/image/...">).
+ *
+ * Servlet nay doc file anh tu thu muc AppConfig.ROOT_UPLOAD_DIR (nam ngoai
+ * project) va tra ve cho trinh duyet khi truy cap URL: /image/<duong-dan-luu-trong-db>
+ * Vi du: /image/products/1710000000000_abc.jpg
+ */
+@WebServlet(urlPatterns = { "/image/*" })
 public class ImageController extends HttpServlet {
-	
+
 	private static final long serialVersionUID = 1L;
-	
-	// CỰC KỲ QUAN TRỌNG: Bạn hãy click vào thanh địa chỉ của thư mục 'img' trên máy bạn, 
-	// copy toàn bộ đường dẫn và dán vào đây (nhớ dùng 2 dấu gạch chéo \\)
-	private final String ROOT_DIR = "C:\\Users\\trant\\Documents\\WEB\\upload\\img"; 
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		// pathInfo sẽ lấy phần phía sau chữ /image (Ví dụ: /female/ao-thun.jpg)
-		String pathInfo = req.getPathInfo(); 
+		String relativePath = req.getPathInfo(); // vi du: /products/xxx.jpg
 
-		if (pathInfo == null || pathInfo.equals("/")) {
+		if (relativePath == null || relativePath.isEmpty() || relativePath.equals("/")) {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
 
-		// Đường dẫn thực tế trỏ tới file trong máy tính
-		File file = new File(ROOT_DIR + pathInfo);
+		// Chuan hoa, bo dau "/" dau tien
+		relativePath = relativePath.replaceFirst("^/", "");
 
-		if (file.exists()) {
-			// Set kiểu dữ liệu trả về là hình ảnh
-			resp.setContentType(getServletContext().getMimeType(file.getName()));
-			resp.setContentLength((int) file.length());
-			
-			// Đọc file và xuất ra trình duyệt
-			try (FileInputStream in = new FileInputStream(file);
-				 OutputStream out = resp.getOutputStream()) {
-				byte[] buffer = new byte[4096];
-				int bytesRead;
-				while ((bytesRead = in.read(buffer)) != -1) {
-					out.write(buffer, 0, bytesRead);
-				}
-			}
-		} else {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+		Path filePath = Paths.get(AppConfig.ROOT_UPLOAD_DIR, relativePath.split("/"));
+		File file = filePath.toFile();
+
+		// Chan path traversal (vd: ../../etc/passwd)
+		String rootCanonical = new File(AppConfig.ROOT_UPLOAD_DIR).getCanonicalPath();
+		String fileCanonical = file.getCanonicalPath();
+		if (!fileCanonical.startsWith(rootCanonical)) {
+			resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+			return;
 		}
+
+		if (!file.exists() || !file.isFile()) {
+			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+			return;
+		}
+
+		String mimeType = Files.probeContentType(filePath);
+		resp.setContentType(mimeType != null ? mimeType : "application/octet-stream");
+		resp.setContentLengthLong(file.length());
+
+		Files.copy(filePath, resp.getOutputStream());
 	}
 }

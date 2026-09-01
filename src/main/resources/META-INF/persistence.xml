@@ -7,6 +7,8 @@
 	<persistence-unit name="jpa-hibernate-sqlserver">
 
 		<class>entity.Category</class>
+		<class>entity.Product</class>
+		<class>entity.User</class>
 		<properties>
 			<property name="jakarta.persistence.jdbc.url"
 				value="jdbc:sqlserver://localhost:1433;databaseName=jakartaJPASample;encrypt=false;trustServerCertificate=true" />
@@ -19,7 +21,8 @@
 			<property name="hibernate.show_sql" value="true" />
 			<property name="hibernate.format_sql" value="true" />
 			<property name="hibernate.hbm2ddl.auto" value="update" />
-			<property name="hibernate.dialect" value="org.hibernate.dialect.SQLServerDialect" />
+			<property name="hibernate.dialect"
+				value="org.hibernate.dialect.SQLServerDialect" />
 		</properties>
 	</persistence-unit>
 
