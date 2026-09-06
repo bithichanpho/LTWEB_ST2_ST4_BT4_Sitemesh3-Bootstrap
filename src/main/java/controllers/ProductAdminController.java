@@ -25,8 +25,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, maxRequestSize = 1024 * 1024 * 5 * 5)
-@WebServlet(urlPatterns = {"/admin/products", "/admin/product/add", "/admin/product/insert", "/admin/product/edit", "/admin/product/update", "/admin/product/delete"})
-
+@WebServlet(urlPatterns = {"/admin/products", "/admin/product/add", "/admin/product/insert", "/admin/product/edit", "/admin/product/update", "/admin/product/delete", "/admin/product/check"})
 public class ProductAdminController extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
@@ -69,7 +68,25 @@ public class ProductAdminController extends HttpServlet {
 			}
 			resp.sendRedirect(req.getContextPath() + "/admin/products");
 			
-		} else {
+		} else if (url.contains("admin/product/check")) {
+		    // API dành cho AJAX kiểm tra trùng lặp
+		    String name = req.getParameter("name");
+		    int categoryId = 0;
+		    try {
+		        categoryId = Integer.parseInt(req.getParameter("categoryId"));
+		    } catch (NumberFormatException e) {
+		        categoryId = 0;
+		    }
+		    
+		    boolean exists = productDao.checkExistByNameAndCategory(name, categoryId);
+		    
+		    // Trả về kết quả JSON
+		    resp.setContentType("application/json");
+		    resp.getWriter().write("{\"exists\": " + exists + "}");
+		    return; // Dừng lại ở đây, không forward trang
+		    
+		}
+		else {
 			resp.sendRedirect(req.getContextPath() + "/admin/products");
 		}
 	}
@@ -87,6 +104,13 @@ public class ProductAdminController extends HttpServlet {
 		if (url.contains("insert")) {
 			try {
 				String name = req.getParameter("productName");
+				Product existingProduct = productDao.findByName(name);
+				if (existingProduct != null) {
+				    req.setAttribute("error", "Tên sản phẩm đã tồn tại! Vui lòng nhập tên khác.");
+				    req.setAttribute("cateList", categoryDao.findAll());
+				    req.getRequestDispatcher("/views/product-add.jsp").forward(req, resp);
+				    return; // Dừng lại, không cho thêm vào DB
+				}
 				double price = Double.parseDouble(req.getParameter("price"));
 				int quantity = Integer.parseInt(req.getParameter("quantity"));
 				String description = req.getParameter("description");

@@ -38,6 +38,13 @@ public class Product implements Serializable {
 	@Column(name = "quantity")
 	private int quantity;
 	
+	// Số lượng sản phẩm đã bán được. Dùng để tính doanh thu (sold * price) cho Dashboard thống kê.
+	// columnDefinition đặt NOT NULL DEFAULT 0 để khi Hibernate tự ALTER TABLE thêm cột này
+	// vào các bản ghi Product đã tồn tại từ trước, cột sẽ được điền sẵn giá trị 0 thay vì NULL
+	// (nếu để NULL, việc map NULL vào kiểu int primitive sẽ làm crash ứng dụng khi đọc dữ liệu).
+	@Column(name = "sold", columnDefinition = "INT NOT NULL DEFAULT 0")
+	private int sold;
+	
 	@Column(name = "createdAt")
 	private LocalDateTime createdAt;
 
@@ -114,6 +121,20 @@ public class Product implements Serializable {
 
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
+	}
+
+	public int getSold() {
+		return sold;
+	}
+
+	public void setSold(int sold) {
+		this.sold = sold;
+	}
+
+	
+	@Transient
+	public double getRevenue() {
+		return sold * price;
 	}
 
 	public LocalDateTime getCreatedAt() {

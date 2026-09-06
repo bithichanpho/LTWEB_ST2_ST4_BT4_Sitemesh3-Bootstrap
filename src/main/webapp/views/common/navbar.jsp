@@ -60,18 +60,26 @@
         position: absolute;
         top: 100%;
         left: 0;
-        background: #fff;
-        min-width: 240px;
-        box-shadow: 0 8px 20px rgba(0,0,0,.12);
-        border-radius: 4px;
-        overflow: hidden;
+        min-width: 260px;
+        padding-top: 10px; /* vùng đệm vô hình, vẫn tính là hover */
         z-index: 100;
-        margin-top: 10px;
     }
 
-    .nav-item:hover .nav-dropdown { display: block; }
+    .nav-item:hover .nav-dropdown,
+    .nav-dropdown:hover { display: block; }
 
-    .nav-dropdown a {
+    .nav-dropdown-inner {
+        background: #fff;
+        border-radius: 4px;
+        box-shadow: 0 8px 20px rgba(0,0,0,.12);
+
+    }
+
+    .nav-dropdown-inner > *:first-child { border-top-left-radius: 4px; border-top-right-radius: 4px; }
+    .nav-dropdown-inner > *:last-child { border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; }
+
+    .nav-dropdown a,
+    .nav-dropdown .nav-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -85,9 +93,41 @@
         border-bottom: 1px solid #f0f0f0;
     }
 
-    .nav-dropdown a:last-child { border-bottom: none; }
+    .nav-dropdown a:last-child,
+    .nav-dropdown .nav-row:last-child { border-bottom: none; }
     .nav-dropdown a:hover { background: #f7f7f7; color: #1a1a1a; }
     .nav-dropdown .count { color: #999; font-size: 12px; }
+
+    /* --- Menu con cấp 2 (flyout sang phải khi hover "Danh mục hàng hóa") --- */
+    .nav-subitem { position: relative; }
+    .nav-subitem .nav-row { cursor: default; }
+    .nav-subitem:hover .nav-row { background: #f7f7f7; }
+    .nav-subitem .arrow { color: #bbb; font-size: 11px; margin-left: 8px; }
+
+    .nav-flyout {
+        display: none;
+        position: absolute;
+        left: 100%;
+        top: 0;
+        min-width: 240px;
+        padding-left: 10px; /* vùng đệm vô hình theo chiều ngang, giữ hover liên tục */
+        z-index: 110;
+    }
+
+    .nav-subitem:hover .nav-flyout,
+    .nav-flyout:hover { display: block; }
+
+    .nav-flyout-inner {
+        background: #fff;
+        border-radius: 4px;
+        box-shadow: 0 8px 20px rgba(0,0,0,.12);
+        overflow: hidden;
+    }
+
+    .nav-flyout a {
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .nav-flyout a:last-child { border-bottom: none; }
 </style>
 <nav class="navbar">
     <div class="nav-left">
@@ -96,14 +136,33 @@
         <span class="nav-item">
             <a href="${pageContext.request.contextPath}/categories">Danh mục ▾</a>
             <div class="nav-dropdown">
-                <c:forEach items="${navCategories}" var="nc">
-                    <a href="${pageContext.request.contextPath}/category/detail?id=${nc.categoryId}">
-                        <span>${nc.categoryname}</span>
-                        <span class="count">${navCategoryCounts[nc.categoryId]} sản phẩm</span>
+                <div class="nav-dropdown-inner">
+                    <div class="nav-subitem">
+                        <span class="nav-row">
+                            <span>Danh mục hàng hóa</span>
+                            <span class="arrow">▸</span>
+                        </span>
+                        <div class="nav-flyout">
+                            <div class="nav-flyout-inner">
+                                <c:forEach items="${navCategories}" var="nc">
+                                    <a href="${pageContext.request.contextPath}/category/detail?id=${nc.categoryId}">
+                                        <span>${nc.categoryname}</span>
+                                        <span class="count">${navCategoryCounts[nc.categoryId]} sản phẩm</span>
+                                    </a>
+                                </c:forEach>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="${pageContext.request.contextPath}/product/stock-report">
+                        <span>Thống kê tổng số lượng</span>
+                        <span class="count">${navTotalProducts} sản phẩm</span>
                     </a>
-                </c:forEach>
+                </div>
             </div>
         </span>
+        <c:if test="${sessionScope.currentUser.role == 'admin'}">
+            <a href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a>
+        </c:if>
     </div>
 
     <div class="logo">Shop</div>

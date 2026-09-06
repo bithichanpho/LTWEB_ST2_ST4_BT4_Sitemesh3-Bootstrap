@@ -7,8 +7,21 @@ import jakarta.persistence.PersistenceContext;
 
 @PersistenceContext
 public class JPAConfig {
+	private static final EntityManagerFactory emf;
+	static {
+		try {
+			emf = Persistence.createEntityManagerFactory("jpa-hibernate-sqlserver");
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	private JPAConfig() {
+		
+	}
+	
 	public static EntityManager getEntityManager() {
-		EntityManagerFactory factory = Persistence.createEntityManagerFactory("jpa-hibernate-sqlserver");
-		return factory.createEntityManager();
+		return emf.createEntityManager();
 	}
 }
+ 

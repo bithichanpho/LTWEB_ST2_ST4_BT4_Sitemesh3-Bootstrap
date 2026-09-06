@@ -55,12 +55,32 @@ public class CategoryController extends HttpServlet {
             List<Category> list = categoryDao.findAll();
 
             Map<Integer, Integer> countMap = new HashMap<>();
+            Map<Integer, Integer> inStockMap = new HashMap<>();
+            Map<Integer, Integer> outStockMap = new HashMap<>();
+            int totalProducts = 0;
+
             for (Category c : list) {
-                countMap.put(c.getCategoryId(), productDao.countByCategory(c.getCategoryId()));
+                List<Product> products = productDao.findByCategory(c.getCategoryId());
+                int total = products.size();
+                int inStock = 0;
+                for (Product p : products) {
+                    if (p.getQuantity() > 0) {
+                        inStock++;
+                    }
+                }
+                int outStock = total - inStock;
+
+                countMap.put(c.getCategoryId(), total);
+                inStockMap.put(c.getCategoryId(), inStock);
+                outStockMap.put(c.getCategoryId(), outStock);
+                totalProducts += total;
             }
 
             req.setAttribute("cateList", list);
             req.setAttribute("countMap", countMap);
+            req.setAttribute("inStockMap", inStockMap);
+            req.setAttribute("outStockMap", outStockMap);
+            req.setAttribute("totalProducts", totalProducts);
             req.getRequestDispatcher("/views/category-list.jsp").forward(req, resp);
 
         } else if (url.contains("category/add")) {
@@ -88,7 +108,7 @@ public class CategoryController extends HttpServlet {
             List<Product> products = productDao.findByCategory(id);
             req.setAttribute("cate", category);
             req.setAttribute("productList", products);
-            req.getRequestDispatcher("/views/category-products.jsp").forward(req, resp);
+            req.getRequestDispatcher("/views/product-manage.jsp").forward(req, resp);
 
         } else if (url.contains("category/delete")) {
             if (!isAdmin(req)) { resp.sendRedirect(req.getContextPath() + "/categories"); return; }

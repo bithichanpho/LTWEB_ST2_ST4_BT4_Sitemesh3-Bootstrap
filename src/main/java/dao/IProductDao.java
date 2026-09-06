@@ -16,4 +16,7 @@ public interface IProductDao {
 	
 	int countByCategory(int categoryId);
 	List<Product> findByCategory(int categoryId);
+	Product findByName(String productName);
+	
+	boolean checkExistByNameAndCategory(String productName, int categoryId);
 }

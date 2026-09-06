@@ -39,6 +39,7 @@ public class NavDataFilter implements Filter {
 			}
 			request.setAttribute("navCategories", categories);
 			request.setAttribute("navCategoryCounts", counts);
+			request.setAttribute("navTotalProducts", productDao.count());
 		}
 
 		chain.doFilter(request, response);

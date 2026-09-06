@@ -150,6 +150,35 @@ public class ProductDao implements IProductDao{
 	    }
 	}
 
+	@Override
+	public Product findByName(String productName) {
+	    EntityManager enma = JPAConfig.getEntityManager();
+	    try {
+	        TypedQuery<Product> query = enma.createQuery(
+	            "SELECT p FROM Product p WHERE p.productName = :name", Product.class);
+	        query.setParameter("name", productName);
+	        return query.getSingleResult();
+	    } catch (NoResultException e) {
+	        return null; // Không có sản phẩm trùng tên
+	    } finally {
+	        enma.close();
+	    }
+	}
 	
+	@Override
+	public boolean checkExistByNameAndCategory(String productName, int categoryId) {
+	    EntityManager enma = JPAConfig.getEntityManager();
+	    try {
+	        TypedQuery<Long> query = enma.createQuery(
+	            "SELECT COUNT(p) FROM Product p WHERE p.productName = :name AND p.category.categoryId = :cid", Long.class);
+	        query.setParameter("name", productName);
+	        query.setParameter("cid", categoryId);
+	        
+	        Long count = query.getSingleResult();
+	        return count > 0; // Trả về true nếu đã tồn tại >= 1 sản phẩm
+	    } finally {
+	        enma.close();
+	    }
+	}
 
 }
