@@ -13,15 +13,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-/**
- * Servlet nay truoc day KHONG TON TAI trong project (day la 1 trong nhung
- * nguyen nhan chinh khien anh san pham/danh muc khong bao gio hien thi duoc,
- * du code JSP da viet dung the <img src="${pageContext.request.contextPath}/image/...">).
- *
- * Servlet nay doc file anh tu thu muc AppConfig.ROOT_UPLOAD_DIR (nam ngoai
- * project) va tra ve cho trinh duyet khi truy cap URL: /image/<duong-dan-luu-trong-db>
- * Vi du: /image/products/1710000000000_abc.jpg
- */
+
 @WebServlet(urlPatterns = { "/image/*" })
 public class ImageController extends HttpServlet {
 
@@ -39,11 +31,13 @@ public class ImageController extends HttpServlet {
 		// Chuan hoa, bo dau "/" dau tien
 		relativePath = relativePath.replaceFirst("^/", "");
 
-		Path filePath = Paths.get(AppConfig.ROOT_UPLOAD_DIR, relativePath.split("/"));
+		String realRootDir = req.getServletContext().getRealPath(AppConfig.ROOT_UPLOAD_DIR);
+
+		Path filePath = Paths.get(realRootDir, relativePath.split("/"));
 		File file = filePath.toFile();
 
 		// Chan path traversal (vd: ../../etc/passwd)
-		String rootCanonical = new File(AppConfig.ROOT_UPLOAD_DIR).getCanonicalPath();
+		String rootCanonical = new File(realRootDir).getCanonicalPath();
 		String fileCanonical = file.getCanonicalPath();
 		if (!fileCanonical.startsWith(rootCanonical)) {
 			resp.sendError(HttpServletResponse.SC_FORBIDDEN);

@@ -143,8 +143,7 @@ public class CategoryController extends HttpServlet {
 
         String url = req.getRequestURI();
 
-        // Icon của category giờ luôn lưu cố định trong thư mục "categories", không cần chọn nữa
-        String uploadPath = ROOT_DIR + File.separator + CATEGORY_IMG_FOLDER;
+        String uploadPath = req.getServletContext().getRealPath(AppConfig.ROOT_UPLOAD_DIR + "/categories");
         File uploadDir = new File(uploadPath);
         if (!uploadDir.exists()) uploadDir.mkdirs();
 

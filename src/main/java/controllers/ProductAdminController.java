@@ -97,8 +97,7 @@ public class ProductAdminController extends HttpServlet {
 		resp.setCharacterEncoding("UTF-8");
 		String url = req.getRequestURI();
 		
-		String uploadPath = ROOT_DIR + File.separator + "products";
-		File uploadDir = new File(uploadPath);
+		String uploadPath = req.getServletContext().getRealPath(AppConfig.ROOT_UPLOAD_DIR + "/products");		File uploadDir = new File(uploadPath);
 		if (!uploadDir.exists()) uploadDir.mkdirs();
 		
 		if (url.contains("insert")) {
