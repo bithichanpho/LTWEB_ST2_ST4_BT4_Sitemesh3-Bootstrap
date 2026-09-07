@@ -84,7 +84,6 @@ body {
 
 <body>
 
-	<%@ include file="/views/common/navbar.jsp" %>
 
 	<div class="container">
 		<a class="back" href="${pageContext.request.contextPath}/product">←

@@ -171,6 +171,7 @@
         <c:choose>
             <c:when test="${not empty sessionScope.currentUser}">
                 <span class="user-info">Xin chào, <b>${sessionScope.currentUser.fullname}</b></span>
+                <a href="${pageContext.request.contextPath}/profile">Hồ sơ</a>
                 <a href="${pageContext.request.contextPath}/logout">Đăng xuất</a>
             </c:when>
             <c:otherwise>

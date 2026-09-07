@@ -223,11 +223,20 @@ select {
 .btn-cancel:hover {
 	color: #e53935;
 }
+
+.field-error {
+	color: #e53935;
+	font-size: 12px;
+	margin-top: 5px;
+}
+
+input.invalid, select.invalid, textarea.invalid {
+	border-color: #e53935 !important;
+}
 </style>
 </head>
 
 <body>
-	<%@ include file="/views/common/navbar.jsp"%>
 
 	<div class="page-wrap">
 		<div class="breadcrumb">
@@ -250,35 +259,54 @@ select {
 				<div class="field">
 					<label>Tên sản phẩm <span class="required">*</span></label> <input
 						type="text" name="productName"
+						class="${not empty fieldErrors.productName ? 'invalid' : ''}"
 						placeholder="Ví dụ: Áo sơ mi trắng nam" required>
+					<c:if test="${not empty fieldErrors.productName}">
+						<div class="field-error">${fieldErrors.productName}</div>
+					</c:if>
 				</div>
 
 				<div class="field">
 					<label>Danh mục <span class="required">*</span></label> <select
-						name="categoryId" required>
+						name="categoryId"
+						class="${not empty fieldErrors.categoryId ? 'invalid' : ''}" required>
 						<option value="" disabled selected>-- Chọn danh mục --</option>
 						<c:forEach items="${cateList}" var="c">
 							<option value="${c.categoryId}">${c.categoryname}</option>
 						</c:forEach>
 					</select>
+					<c:if test="${not empty fieldErrors.categoryId}">
+						<div class="field-error">${fieldErrors.categoryId}</div>
+					</c:if>
 				</div>
 
 				<div class="row-2">
 					<div class="field">
 						<label>Giá (VNĐ) <span class="required">*</span></label> <input
 							type="number" name="price" min="0" step="1000" placeholder="0"
-							required>
+							class="${not empty fieldErrors.price ? 'invalid' : ''}" required>
+						<c:if test="${not empty fieldErrors.price}">
+							<div class="field-error">${fieldErrors.price}</div>
+						</c:if>
 					</div>
 					<div class="field">
 						<label>Số lượng trong kho <span class="required">*</span></label>
-						<input type="number" name="quantity" min="0" value="0" required>
+						<input type="number" name="quantity" min="0" value="0"
+							class="${not empty fieldErrors.quantity ? 'invalid' : ''}" required>
+						<c:if test="${not empty fieldErrors.quantity}">
+							<div class="field-error">${fieldErrors.quantity}</div>
+						</c:if>
 					</div>
 				</div>
 
 				<div class="field">
 					<label>Mô tả</label>
 					<textarea name="description"
+						class="${not empty fieldErrors.description ? 'invalid' : ''}"
 						placeholder="Mô tả ngắn gọn về sản phẩm..."></textarea>
+					<c:if test="${not empty fieldErrors.description}">
+						<div class="field-error">${fieldErrors.description}</div>
+					</c:if>
 				</div>
 
 				<div class="field">
@@ -291,6 +319,9 @@ select {
 							<b>Chọn ảnh</b> hoặc kéo thả vào đây
 						</div>
 					</div>
+					<c:if test="${not empty fieldErrors.images}">
+						<div class="field-error">${fieldErrors.images}</div>
+					</c:if>
 					<div class="preview-wrap" id="previewWrap">
 						<img id="previewImg" src="" alt="Xem trước"> <span
 							class="file-name" id="previewName"></span>

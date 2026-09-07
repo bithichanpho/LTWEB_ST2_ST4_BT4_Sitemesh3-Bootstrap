@@ -257,7 +257,6 @@ select {
 </head>
 
 <body>
-	<%@ include file="/views/common/navbar.jsp"%>
 
 	<div class="page-wrap">
 		<div class="breadcrumb">

@@ -147,7 +147,6 @@ body {
 <body>
 
 
-	<%@ include file="/views/common/navbar.jsp"%>
 
 	<div class="hero">
 		<c:if

@@ -1,0 +1,16 @@
+<sitemesh>
+	<!-- 01 Template Bootstrap dùng chung cho TẤT CẢ các trang (BT03: trang chủ, sản
+		phẩm, danh mục, đăng nhập/đăng ký, quản trị, ...) -->
+	<mapping path="/*" decorator="/main.jsp" />
+
+	<!-- Loại trừ: ảnh tĩnh và tài nguyên JS không phải HTML -->
+	<mapping path="/image/*" exclude="true" />
+	<mapping path="/js/*" exclude="true" />
+
+	<!-- Loại trừ: tài nguyên tĩnh của Template Bootstrap (Start Bootstrap - Agency) -->
+	<mapping path="/theme/*" exclude="true" />
+
+	<!-- API AJAX trả JSON: Sitemesh chỉ áp dụng cho response text/html nên các endpoint
+		 này tự động được bỏ qua, nhưng khai báo tường minh cho rõ ràng -->
+	<mapping path="/admin/product/check" exclude="true" />
+</sitemesh>

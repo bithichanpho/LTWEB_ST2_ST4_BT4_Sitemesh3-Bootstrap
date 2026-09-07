@@ -2,9 +2,15 @@ package controllers;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 import dao.IUserDao;
 import dao.impl.UserDao;
+import dto.ForgotPasswordForm;
+import dto.LoginForm;
+import dto.RegisterForm;
+import dto.ResetPasswordForm;
+import dto.VerifyOtpForm;
 import entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,6 +21,7 @@ import jakarta.servlet.http.HttpSession;
 import utils.EmailUtil;
 import utils.OtpUtil;
 import utils.PasswordUtil;
+import utils.ValidationUtil;
 
 @WebServlet(urlPatterns = {"/register", "/verify-otp", "/resend-otp", "/login", "/logout", "/forgot-password", "/reset-password"})
 public class AuthController extends HttpServlet{
@@ -93,15 +100,22 @@ public class AuthController extends HttpServlet{
 		String email = req.getParameter("email");
 		String password = req.getParameter("password");
 		String confirmPassword = req.getParameter("confirmPassword");
-		
-		if (email == null || email.trim().isEmpty() || password == null || password.trim().isEmpty()) {
-			req.setAttribute("error", "Vui lòng nhập đầy đủ thông tin");
-			req.getRequestDispatcher("/views/register.jsp").forward(req, resp);
-			return;
+
+		RegisterForm form = new RegisterForm();
+		form.setFullname(fullname);
+		form.setEmail(email);
+		form.setPassword(password);
+		form.setConfirmPassword(confirmPassword);
+
+		Map<String, String> errors = ValidationUtil.validate(form);
+		if (password != null && confirmPassword != null && !password.equals(confirmPassword)) {
+			errors.put("confirmPassword", "Mật khẩu không khớp");
 		}
-		
-		if (!password.equals(confirmPassword)) {
-			req.setAttribute("error", "Mật khẩu không khớp");
+
+		if (!errors.isEmpty()) {
+			req.setAttribute("fieldErrors", errors);
+			req.setAttribute("fullname", fullname);
+			req.setAttribute("email", email);
 			req.getRequestDispatcher("/views/register.jsp").forward(req, resp);
 			return;
 		}
@@ -155,6 +169,16 @@ public class AuthController extends HttpServlet{
 			return;
 			
 		}
+
+		VerifyOtpForm form = new VerifyOtpForm();
+		form.setOtp(otpInput);
+		Map<String, String> errors = ValidationUtil.validate(form);
+		if (!errors.isEmpty()) {
+			req.setAttribute("error", errors.values().iterator().next());
+			req.setAttribute("email", email);
+			req.getRequestDispatcher("/views/verify-otp.jsp").forward(req, resp);
+			return;
+		}
 		
 		User user = userDao.findByEmail(email);
 		if (user != null && user.getOtpCode() != null 
@@ -198,6 +222,17 @@ public class AuthController extends HttpServlet{
 	private void handleLogin(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String email = req.getParameter("email");
 		String password = req.getParameter("password");
+
+		LoginForm form = new LoginForm();
+		form.setEmail(email);
+		form.setPassword(password);
+		Map<String, String> errors = ValidationUtil.validate(form);
+		if (!errors.isEmpty()) {
+			req.setAttribute("fieldErrors", errors);
+			req.setAttribute("email", email);
+			req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
+			return;
+		}
 		
 		User user = userDao.findByEmail(email);
 		if (user == null || !PasswordUtil.checkPassword(password, user.getPassword())) {
@@ -220,6 +255,17 @@ public class AuthController extends HttpServlet{
 	
 	private void handleForgotPassword(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String email = req.getParameter("email");
+
+		ForgotPasswordForm form = new ForgotPasswordForm();
+		form.setEmail(email);
+		Map<String, String> errors = ValidationUtil.validate(form);
+		if (!errors.isEmpty()) {
+			req.setAttribute("fieldErrors", errors);
+			req.setAttribute("email", email);
+			req.getRequestDispatcher("/views/forgot-password.jsp").forward(req, resp);
+			return;
+		}
+
 		User user = userDao.findByEmail(email);
 		
 		if (user == null) {
@@ -249,9 +295,19 @@ public class AuthController extends HttpServlet{
 		String otpInput = req.getParameter("otp");
 		String newPassword = req.getParameter("newPassword");
 		String confirmPassword = req.getParameter("confirmPassword");
-		
-		if (newPassword == null || !newPassword.equals(confirmPassword)) {
-			req.setAttribute("error", "Mật khẩu không khớp");
+
+		ResetPasswordForm form = new ResetPasswordForm();
+		form.setOtp(otpInput);
+		form.setNewPassword(newPassword);
+		form.setConfirmPassword(confirmPassword);
+
+		Map<String, String> errors = ValidationUtil.validate(form);
+		if (newPassword != null && confirmPassword != null && !newPassword.equals(confirmPassword)) {
+			errors.put("confirmPassword", "Mật khẩu không khớp");
+		}
+
+		if (!errors.isEmpty()) {
+			req.setAttribute("fieldErrors", errors);
 			req.setAttribute("email", email);
 			req.getRequestDispatcher("/views/reset-password.jsp").forward(req, resp);
 			return;

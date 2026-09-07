@@ -62,6 +62,16 @@
 					margin-bottom: 10px;
 				}
 
+				.field-error {
+					color: red;
+					font-size: 12px;
+					margin-top: 4px;
+				}
+
+				input.invalid {
+					border-color: red;
+				}
+
 				.message {
 					color: green;
 					margin-bottom: 10px;
@@ -89,10 +99,20 @@
 
 				<form action="${pageContext.request.contextPath}/login" method="post">
 					<div class="field">
-						<label>Email:</label> <input type="email" name="email" required>
+						<label>Email:</label>
+						<input type="email" name="email" value="${email}"
+							class="${not empty fieldErrors.email ? 'invalid' : ''}" required>
+						<c:if test="${not empty fieldErrors.email}">
+							<div class="field-error">${fieldErrors.email}</div>
+						</c:if>
 					</div>
 					<div class="field">
-						<label>Mật khẩu:</label> <input type="password" name="password" required>
+						<label>Mật khẩu:</label>
+						<input type="password" name="password"
+							class="${not empty fieldErrors.password ? 'invalid' : ''}" required>
+						<c:if test="${not empty fieldErrors.password}">
+							<div class="field-error">${fieldErrors.password}</div>
+						</c:if>
 					</div>
 					<button type="submit">Đăng nhập</button>
 				</form>

@@ -75,6 +75,16 @@
 
         .field .required { color: #e53935; }
 
+        .field-error {
+            color: #e53935;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        input.invalid {
+            border-color: #e53935 !important;
+        }
+
         .field .hint {
             font-size: 12px;
             color: #999;
@@ -223,7 +233,6 @@
 </head>
 
 <body>
-    <%@ include file="/views/common/navbar.jsp" %>
 
     <div class="page-wrap">
         <div class="breadcrumb">
@@ -243,7 +252,11 @@
 
                 <div class="field">
                     <label>Tên Category <span class="required">*</span></label>
-                    <input type="text" name="categoryname" value="${cate.categoryname}" required>
+                    <input type="text" name="categoryname" value="${cate.categoryname}"
+                        class="${not empty fieldErrors.categoryname ? 'invalid' : ''}" required>
+                    <c:if test="${not empty fieldErrors.categoryname}">
+                        <div class="field-error">${fieldErrors.categoryname}</div>
+                    </c:if>
                 </div>
 
                 <div class="field">
@@ -273,7 +286,11 @@
 
                 <div class="field">
                     <label>Số lượng trong kho (Trạng thái) <span class="required">*</span></label>
-                    <input type="number" name="status" value="${cate.status}" min="0" class="status-input" required>
+                    <input type="number" name="status" value="${cate.status}" min="0"
+                        class="status-input ${not empty fieldErrors.status ? 'invalid' : ''}" required>
+                    <c:if test="${not empty fieldErrors.status}">
+                        <div class="field-error">${fieldErrors.status}</div>
+                    </c:if>
                     <div class="hint">Nhập số lượng &gt; 0 là In stock, nhập 0 là Out of stock.</div>
                 </div>
 

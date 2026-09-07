@@ -132,7 +132,6 @@ img {
 </head>
 <body>
 
-	<%@ include file="/views/common/navbar.jsp"%>
 
 	<div class="container">
 		<h2>

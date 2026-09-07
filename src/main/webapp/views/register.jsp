@@ -63,6 +63,16 @@
 					margin-bottom: 10px;
 				}
 
+				.field-error {
+					color: red;
+					font-size: 12px;
+					margin-top: 4px;
+				}
+
+				input.invalid {
+					border-color: red;
+				}
+
 				.link {
 					text-align: center;
 					margin-top: 15px;
@@ -80,17 +90,36 @@
 
 				<form action="${pageContext.request.contextPath}/register" method="post">
 					<div class="field">
-						<label>Họ tên:</label> <input type="text" name="fullname" required>
+						<label>Họ tên:</label>
+						<input type="text" name="fullname" value="${fullname}"
+							class="${not empty fieldErrors.fullname ? 'invalid' : ''}" required>
+						<c:if test="${not empty fieldErrors.fullname}">
+							<div class="field-error">${fieldErrors.fullname}</div>
+						</c:if>
 					</div>
 					<div class="field">
-						<label>Email:</label> <input type="email" name="email" required>
+						<label>Email:</label>
+						<input type="email" name="email" value="${email}"
+							class="${not empty fieldErrors.email ? 'invalid' : ''}" required>
+						<c:if test="${not empty fieldErrors.email}">
+							<div class="field-error">${fieldErrors.email}</div>
+						</c:if>
 					</div>
 					<div class="field">
-						<label>Mật khẩu:</label> <input type="password" name="password" required minlength="6">
+						<label>Mật khẩu:</label>
+						<input type="password" name="password"
+							class="${not empty fieldErrors.password ? 'invalid' : ''}" required minlength="6">
+						<c:if test="${not empty fieldErrors.password}">
+							<div class="field-error">${fieldErrors.password}</div>
+						</c:if>
 					</div>
 					<div class="field">
-						<label>Nhập lại mật khẩu:</label> <input type="password" name="confirmPassword" required
-							minlength="6">
+						<label>Nhập lại mật khẩu:</label>
+						<input type="password" name="confirmPassword"
+							class="${not empty fieldErrors.confirmPassword ? 'invalid' : ''}" required minlength="6">
+						<c:if test="${not empty fieldErrors.confirmPassword}">
+							<div class="field-error">${fieldErrors.confirmPassword}</div>
+						</c:if>
 					</div>
 					<button type="submit">Đăng ký</button>
 				</form>

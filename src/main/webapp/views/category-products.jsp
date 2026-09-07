@@ -21,7 +21,6 @@
 </head>
 <body>
 
-<%@ include file="/views/common/navbar.jsp" %>
 
     <div class="container">
         <a class="back" href="${pageContext.request.contextPath}/categories">← Quay lại danh sách Category</a>

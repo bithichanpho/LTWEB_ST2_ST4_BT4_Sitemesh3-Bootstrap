@@ -331,7 +331,6 @@ th.sortable.asc .sort-icon, th.sortable.desc .sort-icon {
 </head>
 
 <body>
-	<%@ include file="/views/common/navbar.jsp"%>
 
 	<div class="container">
 		<h2 class="page-title">Dashboard doanh số</h2>

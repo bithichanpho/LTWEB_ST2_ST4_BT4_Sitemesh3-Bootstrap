@@ -72,7 +72,6 @@ img {
 
 <body>
     <!-- NẾU BẠN CÓ NAVBAR CHUNG, BỎ COMMENT DÒNG DƯỚI ĐỂ INCLUDE VÀO (sửa lại đúng đường dẫn) -->
-    <jsp:include page="/views/common/navbar.jsp"></jsp:include>
 
 	<h2>Quản lý Product</h2>
 

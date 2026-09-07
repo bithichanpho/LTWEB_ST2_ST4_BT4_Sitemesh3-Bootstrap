@@ -16,6 +16,7 @@ import dao.ICategoryDao;
 import dao.IProductDao;
 import dao.impl.CategoryDao;
 import dao.impl.ProductDao;
+import dto.CategoryForm;
 import entity.Category;
 import entity.Product;
 import entity.User;
@@ -26,6 +27,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
+import utils.ValidationUtil;
 
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 5 * 5)
 @WebServlet(urlPatterns = { "/categories", "/category/add", "/category/insert",
@@ -149,15 +151,38 @@ public class CategoryController extends HttpServlet {
 
         if (url.contains("insert")) {
             String name = req.getParameter("categoryname");
+            String statusStr = req.getParameter("status");
 
-            Category existing = categoryDao.findByCategoryname(name);
-            if (existing != null) {
-                req.setAttribute("error", "Tên Category '" + name + "' đã tồn tại (ID=" + existing.getCategoryId() + ")");
+            Map<String, String> errors = new java.util.LinkedHashMap<>();
+            Integer status = parseInt(statusStr, "status", errors);
+
+            CategoryForm form = new CategoryForm();
+            form.setCategoryname(name);
+            form.setStatus(status);
+            errors.putAll(ValidationUtil.validate(form));
+
+            Part imagePart = req.getPart("images");
+            if (imagePart == null || imagePart.getSize() == 0) {
+                errors.putIfAbsent("images", "Vui lòng chọn icon cho danh mục");
+            }
+
+            if (!errors.isEmpty()) {
+                req.setAttribute("fieldErrors", errors);
+                req.setAttribute("categoryname", name);
+                req.setAttribute("status", statusStr);
                 req.getRequestDispatcher("/views/category-add.jsp").forward(req, resp);
                 return;
             }
 
-            int status = Integer.parseInt(req.getParameter("status"));
+            Category existing = categoryDao.findByCategoryname(name);
+            if (existing != null) {
+                req.setAttribute("error", "Tên Category '" + name + "' đã tồn tại (ID=" + existing.getCategoryId() + ")");
+                req.setAttribute("categoryname", name);
+                req.setAttribute("status", statusStr);
+                req.getRequestDispatcher("/views/category-add.jsp").forward(req, resp);
+                return;
+            }
+
             String dbImageValue = "";
 
             Part part = req.getPart("images");
@@ -182,6 +207,25 @@ public class CategoryController extends HttpServlet {
         } else if (url.contains("update")) {
             int id = Integer.parseInt(req.getParameter("categoryId"));
             String name = req.getParameter("categoryname");
+            String statusStr = req.getParameter("status");
+
+            Map<String, String> errors = new java.util.LinkedHashMap<>();
+            Integer status = parseInt(statusStr, "status", errors);
+
+            CategoryForm form = new CategoryForm();
+            form.setCategoryname(name);
+            form.setStatus(status);
+            errors.putAll(ValidationUtil.validate(form));
+
+            if (!errors.isEmpty()) {
+                req.setAttribute("fieldErrors", errors);
+                Category current = categoryDao.findById(id);
+                current.setCategoryname(name);
+                current.setStatus(status != null ? status : current.getStatus());
+                req.setAttribute("cate", current);
+                req.getRequestDispatcher("/views/category-edit.jsp").forward(req, resp);
+                return;
+            }
 
             Category existing = categoryDao.findByCategoryname(name);
             if (existing != null && existing.getCategoryId() != id) {
@@ -191,7 +235,6 @@ public class CategoryController extends HttpServlet {
                 return;
             }
 
-            int status = Integer.parseInt(req.getParameter("status"));
             Category category = new Category();
             category.setCategoryId(id);
             category.setCategoryname(name);
@@ -213,6 +256,20 @@ public class CategoryController extends HttpServlet {
 
             categoryDao.update(category);
             resp.sendRedirect(req.getContextPath() + "/categories");
+        }
+    }
+
+    // Parse an integer request param; nếu lỗi thì ghi vào map errors thay vì ném exception,
+    // để trang có thể hiển thị lỗi rõ ràng thay vì crash 500 (giống ProductAdminController).
+    private Integer parseInt(String raw, String field, Map<String, String> errors) {
+        if (raw == null || raw.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(raw.trim());
+        } catch (NumberFormatException e) {
+            errors.put(field, "Giá trị không hợp lệ");
+            return null;
         }
     }
 }

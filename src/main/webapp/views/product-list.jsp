@@ -130,7 +130,6 @@
 
 <body>
 
-	<%@ include file="/views/common/navbar.jsp" %>
 
 	<div class="container">
 		<div class="header-row">

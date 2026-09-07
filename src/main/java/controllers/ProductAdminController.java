@@ -8,12 +8,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Map;
 
 import configs.AppConfig;
 import dao.ICategoryDao;
 import dao.IProductDao;
 import dao.impl.CategoryDao;
 import dao.impl.ProductDao;
+import dto.ProductForm;
 import entity.Category;
 import entity.Product;
 import jakarta.servlet.ServletException;
@@ -23,6 +25,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
+import utils.ValidationUtil;
 
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, maxRequestSize = 1024 * 1024 * 5 * 5)
 @WebServlet(urlPatterns = {"/admin/products", "/admin/product/add", "/admin/product/insert", "/admin/product/edit", "/admin/product/update", "/admin/product/delete", "/admin/product/check"})
@@ -101,8 +104,39 @@ public class ProductAdminController extends HttpServlet {
 		if (!uploadDir.exists()) uploadDir.mkdirs();
 		
 		if (url.contains("insert")) {
+			String name = req.getParameter("productName");
+			String priceStr = req.getParameter("price");
+			String quantityStr = req.getParameter("quantity");
+			String description = req.getParameter("description");
+			String categoryIdStr = req.getParameter("categoryId");
+
+			ProductForm form = new ProductForm();
+			form.setProductName(name);
+			form.setDescription(description);
+
+			Map<String, String> errors = new java.util.LinkedHashMap<>();
+			Double price = parseDouble(priceStr, "price", errors);
+			Integer quantity = parseInt(quantityStr, "quantity", errors);
+			Integer categoryId = parseInt(categoryIdStr, "categoryId", errors);
+			form.setPrice(price);
+			form.setQuantity(quantity);
+			form.setCategoryId(categoryId);
+
+			errors.putAll(ValidationUtil.validate(form));
+
+			Part imagePart = req.getPart("images");
+			if (imagePart == null || imagePart.getSize() == 0) {
+				errors.putIfAbsent("images", "Vui lòng chọn hình ảnh sản phẩm");
+			}
+
+			if (!errors.isEmpty()) {
+				req.setAttribute("fieldErrors", errors);
+				req.setAttribute("cateList", categoryDao.findAll());
+				req.getRequestDispatcher("/views/product-add.jsp").forward(req, resp);
+				return;
+			}
+
 			try {
-				String name = req.getParameter("productName");
 				Product existingProduct = productDao.findByName(name);
 				if (existingProduct != null) {
 				    req.setAttribute("error", "Tên sản phẩm đã tồn tại! Vui lòng nhập tên khác.");
@@ -110,11 +144,7 @@ public class ProductAdminController extends HttpServlet {
 				    req.getRequestDispatcher("/views/product-add.jsp").forward(req, resp);
 				    return; // Dừng lại, không cho thêm vào DB
 				}
-				double price = Double.parseDouble(req.getParameter("price"));
-				int quantity = Integer.parseInt(req.getParameter("quantity"));
-				String description = req.getParameter("description");
-				int categoryId = Integer.parseInt(req.getParameter("categoryId"));
-				
+
 				String dbImageValue = "";
 				Part part = req.getPart("images");
 				if (part != null && part.getSize() > 0) {
@@ -148,14 +178,36 @@ public class ProductAdminController extends HttpServlet {
 			}
 			
 		} else if (url.contains("update")) {
+			int id = Integer.parseInt(req.getParameter("productId"));
+			String name = req.getParameter("productName");
+			String priceStr = req.getParameter("price");
+			String quantityStr = req.getParameter("quantity");
+			String description = req.getParameter("description");
+			String categoryIdStr = req.getParameter("categoryId");
+
+			ProductForm form = new ProductForm();
+			form.setProductName(name);
+			form.setDescription(description);
+
+			Map<String, String> errors = new java.util.LinkedHashMap<>();
+			Double price = parseDouble(priceStr, "price", errors);
+			Integer quantity = parseInt(quantityStr, "quantity", errors);
+			Integer categoryId = parseInt(categoryIdStr, "categoryId", errors);
+			form.setPrice(price);
+			form.setQuantity(quantity);
+			form.setCategoryId(categoryId);
+
+			errors.putAll(ValidationUtil.validate(form));
+
+			if (!errors.isEmpty()) {
+				req.setAttribute("fieldErrors", errors);
+				req.setAttribute("product", productDao.findById(id));
+				req.setAttribute("cateList", categoryDao.findAll());
+				req.getRequestDispatcher("/views/product-edit.jsp").forward(req, resp);
+				return;
+			}
+
 			try {
-				int id = Integer.parseInt(req.getParameter("productId"));
-				String name = req.getParameter("productName");
-				double price = Double.parseDouble(req.getParameter("price"));
-				int quantity = Integer.parseInt(req.getParameter("quantity"));
-				String description = req.getParameter("description");
-				int categoryId = Integer.parseInt(req.getParameter("categoryId"));
-				
 				Product product = new Product();
 				product.setProductId(id);
 				product.setProductName(name);
@@ -190,7 +242,32 @@ public class ProductAdminController extends HttpServlet {
 			}
 		}
 	}
-	
+
+	// Parse an integer request param; nếu lỗi thì ghi vào map errors thay vì ném exception,
+	// để trang có thể hiển thị lỗi rõ ràng thay vì crash 500.
+	private Integer parseInt(String raw, String field, Map<String, String> errors) {
+		if (raw == null || raw.trim().isEmpty()) {
+			return null; // để @NotNull của bean validation bắt lỗi "không được để trống"
+		}
+		try {
+			return Integer.parseInt(raw.trim());
+		} catch (NumberFormatException e) {
+			errors.put(field, "Giá trị không hợp lệ");
+			return null;
+		}
+	}
+
+	private Double parseDouble(String raw, String field, Map<String, String> errors) {
+		if (raw == null || raw.trim().isEmpty()) {
+			return null;
+		}
+		try {
+			return Double.parseDouble(raw.trim());
+		} catch (NumberFormatException e) {
+			errors.put(field, "Giá trị không hợp lệ");
+			return null;
+		}
+	}
 	
 	
 
