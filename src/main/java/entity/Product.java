@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "products")
@@ -11,6 +14,9 @@ import jakarta.persistence.*;
 @NamedQuery(name = "Product.findLatest", query = "SELECT p FROM Product p ORDER BY p.createdAt DESC")
 @NamedQuery(name = "Product.countAll", query = "SELECT COUNT(p) FROM Product p")
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 public class Product implements Serializable {
 
 	/**
@@ -53,109 +59,10 @@ public class Product implements Serializable {
 	@JoinColumn(name = "categoryId", nullable = false)
 	private Category category;
 
-	public Product() {
-		super();
-	}
-	
-	@PrePersist
-	protected void onCreate() {
-		if (this.createdAt == null) {
-			this.createdAt = LocalDateTime.now();
-		}
-	}
-
-	public Product(int productId, String productName, double price, String images, LocalDateTime createdAt,
-			Category category) {
-		super();
-		this.productId = productId;
-		this.productName = productName;
-		this.price = price;
-		this.images = images;
-		this.createdAt = createdAt;
-		this.category = category;
-	}
-
-	public int getProductId() {
-		return productId;
-	}
-
-	public void setProductId(int productId) {
-		this.productId = productId;
-	}
-
-	public String getProductName() {
-		return productName;
-	}
-
-	public void setProductName(String productName) {
-		this.productName = productName;
-	}
-
-	public double getPrice() {
-		return price;
-	}
-
-	public void setPrice(double price) {
-		this.price = price;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public String getImages() {
-		return images;
-	}
-
-	public void setImages(String images) {
-		this.images = images;
-	}
-
-	public int getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(int quantity) {
-		this.quantity = quantity;
-	}
-
-	public int getSold() {
-		return sold;
-	}
-
-	public void setSold(int sold) {
-		this.sold = sold;
-	}
-
 	
 	@Transient
 	public double getRevenue() {
 		return sold * price;
 	}
 
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-
-	public Category getCategory() {
-		return category;
-	}
-
-	public void setCategory(Category category) {
-		this.category = category;
-	}
-	
-	
-	
-
-
-	
 }

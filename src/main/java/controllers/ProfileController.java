@@ -24,17 +24,6 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import utils.ValidationUtil;
 
-/**
- * Chức năng Profile của User: cho phép người dùng đã đăng nhập cập nhật
- * fullname, phone và ảnh đại diện (avatar). Dùng JPA (qua IUserDao/UserDao)
- * để đọc/ghi CSDL, giao diện được quản lý bởi Sitemesh (trang JSP nội dung
- * thuần, không tự vẽ layout/navbar - decorator /WEB-INF/decorators/main.jsp
- * lo phần đó).
- *
- * Quy ước lưu/đọc ảnh giống hệt Product/Category: file được lưu vào
- * {ROOT_UPLOAD_DIR}/users/xxx.jpg, giá trị lưu trong DB là "users/xxx.jpg",
- * và được đọc ra qua ImageController: /image/users/xxx.jpg
- */
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 5 * 5)
 @WebServlet(urlPatterns = { "/profile", "/profile/update" })
 public class ProfileController extends HttpServlet {
@@ -43,7 +32,6 @@ public class ProfileController extends HttpServlet {
 
 	private IUserDao userDao = new UserDao();
 
-	// Thư mục cố định để lưu avatar của User (giống cách CategoryController dùng CATEGORY_IMG_FOLDER)
 	private static final String AVATAR_FOLDER = "users";
 
 	@Override

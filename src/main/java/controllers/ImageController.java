@@ -21,7 +21,7 @@ public class ImageController extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String relativePath = req.getPathInfo(); // vi du: /products/xxx.jpg
+		String relativePath = req.getPathInfo(); 
 
 		if (relativePath == null || relativePath.isEmpty() || relativePath.equals("/")) {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);

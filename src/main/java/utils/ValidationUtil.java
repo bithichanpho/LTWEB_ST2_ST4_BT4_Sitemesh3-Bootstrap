@@ -9,16 +9,6 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
-/**
- * Dùng chung cho toàn bộ ứng dụng để validate các *Form (DTO) bằng Jakarta Bean
- * Validation (Hibernate Validator). Controller chỉ cần gọi:
- *
- *   Map<String, String> errors = ValidationUtil.validate(form);
- *   if (!errors.isEmpty()) { ... hiển thị lỗi ... }
- *
- * Key của Map là tên field (vd "email", "password"), value là message lỗi
- * (tiếng Việt, khai báo ngay trong DTO bằng thuộc tính message = "...").
- */
 public class ValidationUtil {
 
 	private static final ValidatorFactory FACTORY = Validation.buildDefaultValidatorFactory();

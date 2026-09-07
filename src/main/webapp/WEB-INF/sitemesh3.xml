@@ -1,6 +1,5 @@
 <sitemesh>
-	<!-- 01 Template Bootstrap dùng chung cho TẤT CẢ các trang (BT03: trang chủ, sản
-		phẩm, danh mục, đăng nhập/đăng ký, quản trị, ...) -->
+	<!--Template Bootstrap dùng chung cho TẤT CẢ các trang ( -->
 	<mapping path="/*" decorator="/main.jsp" />
 
 	<!-- Loại trừ: ảnh tĩnh và tài nguyên JS không phải HTML -->

@@ -1,18 +1,4 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%-- ===========================================================================
-	 SITEMESH DECORATOR (Bootstrap Template: Start Bootstrap - Agency)
-	 -----------------------------------------------------------------------
-	 File này là 01 Decorator duy nhất dùng chung cho toàn bộ ứng dụng, áp
-	 dụng 01 Template Bootstrap (Start Bootstrap - Agency, đã tải về và đặt
-	 tại /theme/agency/) cho TẤT CẢ các trang (BT03: trang chủ, sản phẩm,
-	 danh mục, đăng nhập/đăng ký, quản trị, ...).
-
-	 Các thẻ <sitemesh:write property="..."/> KHÔNG phải là JSP taglib - vì
-	 không khai báo <%@ taglib %> cho prefix "sitemesh" nên JSP sẽ in nguyên
-	 văn các thẻ này ra output, sau đó chính Sitemesh Filter (bọc ngoài) sẽ
-	 quét lại output và thay thế bằng nội dung tách được từ trang content
-	 (được cấu hình map tới decorator này trong /WEB-INF/sitemesh3.xml).
-	 =========================================================================== --%>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -31,7 +17,7 @@
 <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
 <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700" rel="stylesheet" type="text/css">
 
-<!-- 01 Template Bootstrap dùng chung: Start Bootstrap - Agency (đã bundle sẵn Bootstrap 5) -->
+<!-- Template Bootstrap dùng chung: Start Bootstrap - Agency-->
 <link href="${pageContext.request.contextPath}/theme/agency/css/styles.css" rel="stylesheet">
 
 <style>
@@ -50,9 +36,7 @@ body { display: flex; flex-direction: column; min-height: 100vh; }
 
 <body id="page-top">
 
-	<!-- Giữ nguyên navbar cũ (đã xử lý danh mục động, phân quyền admin, đăng nhập/đăng
-		xuất qua NavDataFilter/session) để không phải viết lại toàn bộ logic;
-		chỉ mượn bảng màu/typography của Template Agency thông qua styles.css ở trên. -->
+	<!-- Giữ nguyên navbar cũ -->
 	<jsp:include page="/views/common/navbar.jsp" />
 
 	<main class="sm-main">

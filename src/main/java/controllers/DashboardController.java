@@ -24,20 +24,11 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  * Dashboard thống kê doanh số cho admin: doanh thu theo từng Category,
  * sản phẩm bán chạy, tổng quan số lượng đã bán / doanh thu toàn cửa hàng.
- *
- * Vì hệ thống hiện chưa có nghiệp vụ "đơn hàng" thực sự (không có bảng Order),
- * số lượng "đã bán" (sold) của từng Product được random một lần duy nhất
- * trong khoảng 400 - 800 (khi cột "sold" của sản phẩm đó còn đang là 0),
- * sau đó được lưu lại vào DB nên các lần xem Dashboard tiếp theo số liệu
- * không đổi (không random lại mỗi lần load trang).
  */
 @WebServlet(urlPatterns = { "/admin/dashboard" })
 public class DashboardController extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-
-	private static final int MIN_SOLD = 400;
-	private static final int MAX_SOLD = 800; // inclusive
 
 	private IProductDao productDao = new ProductDao();
 	private ICategoryDao categoryDao = new CategoryDao();
@@ -49,10 +40,6 @@ public class DashboardController extends HttpServlet {
 		resp.setCharacterEncoding("UTF-8");
 
 		List<Product> products = productDao.findAll();
-
-		// Sinh ngẫu nhiên số lượng đã bán (400-800) cho những sản phẩm chưa có dữ liệu,
-		// rồi lưu lại để lần sau khỏi random lại.
-		seedSoldIfMissing(products);
 
 		List<Category> categories = categoryDao.findAll();
 
@@ -106,17 +93,4 @@ public class DashboardController extends HttpServlet {
 		req.getRequestDispatcher("/views/admin-dashboard.jsp").forward(req, resp);
 	}
 
-	private void seedSoldIfMissing(List<Product> products) {
-		for (Product p : products) {
-			if (p.getSold() <= 0) {
-				int sold = MIN_SOLD + random.nextInt(MAX_SOLD - MIN_SOLD + 1);
-				p.setSold(sold);
-				try {
-					productDao.update(p);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
 }

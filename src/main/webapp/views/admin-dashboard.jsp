@@ -9,7 +9,6 @@
 <head>
 <meta charset="UTF-8">
 <title>Dashboard doanh số</title>
-<!-- THÊM DÒNG NÀY -->
 <script src="${pageContext.request.contextPath}/js/chart.umd.min.js"></script>
 <style>
 * {
@@ -41,7 +40,6 @@ body {
 	margin: 0 0 26px;
 }
 
-/* ---------- Summary cards (giống mẫu: icon tròn màu + số liệu + thanh màu) ---------- */
 .summary {
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
@@ -450,7 +448,7 @@ th.sortable.asc .sort-icon, th.sortable.desc .sort-icon {
 			</div>
 		</div>
 
-		<!-- ===== Bảng sản phẩm bán chạy ===== -->
+		<!--Bảng sản phẩm bán chạy -->
 		<div class="section">
 			<h3 class="section-title">Sản phẩm bán chạy</h3>
 

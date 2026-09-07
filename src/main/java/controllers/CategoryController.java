@@ -39,7 +39,6 @@ public class CategoryController extends HttpServlet {
     private IProductDao productDao = new ProductDao();
     private final String ROOT_DIR = AppConfig.ROOT_UPLOAD_DIR;
 
-    // Thư mục cố định để lưu icon của Category (không còn phụ thuộc female/male/accessories nữa)
     private static final String CATEGORY_IMG_FOLDER = "categories";
 
     private boolean isAdmin(HttpServletRequest req) {

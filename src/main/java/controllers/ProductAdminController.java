@@ -36,8 +36,6 @@ public class ProductAdminController extends HttpServlet {
 	private IProductDao productDao = new ProductDao();
 	private ICategoryDao categoryDao = new CategoryDao();
 	
-	// Dùng chung 1 nơi cấu hình thư mục upload với ImageController/CategoryController
-	// (configs.AppConfig) để ảnh lưu vào và ảnh đọc ra luôn khớp nhau.
 	private final String ROOT_DIR = AppConfig.ROOT_UPLOAD_DIR;
 	
 	@Override
