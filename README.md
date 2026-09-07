@@ -27,17 +27,10 @@ File: `src/main/resources/META-INF/persistence.xml`
 
 **Lưu ý khi chạy trên máy khác:**
 - Đảm bảo SQL Server đang chạy ở `localhost:1433` (hoặc sửa lại `url` cho đúng host/port của bạn).
-- `hibernate.hbm2ddl.auto=update` → Hibernate tự tạo/cập nhật 3 bảng `users`, `categories`,
-  `products` theo entity khi ứng dụng khởi động lần đầu — chỉ cần tạo sẵn database trống
-  tên `jakartaJPASample` (hoặc đổi tên database trong `url` theo ý muốn). Khi thêm field
-  mới vào entity (ví dụ `phone`, `avatar` của `User` cho chức năng Profile), Hibernate sẽ
-  tự `ALTER TABLE ... ADD` cột mới, không cần chạy tay script SQL.
 - Sửa `jakarta.persistence.jdbc.user` / `jakarta.persistence.jdbc.password` khớp với tài
   khoản SQL Server thực tế của bạn.
 - Đường dẫn lưu ảnh upload (không thuộc `persistence.xml`) được cấu hình riêng tại
-  `src/main/java/configs/AppConfig.java` (`ROOT_UPLOAD_DIR = "/image"`) — ảnh được lưu
-  theo 3 thư mục con: `image/products/`, `image/categories/`, `image/users/` (avatar),
-  và đọc lại qua `ImageController` (`/image/...`).
+  `src/main/java/configs/AppConfig.java` (`ROOT_UPLOAD_DIR = "/image"`).
 
 
 ## Tài khoản đăng nhập để test
@@ -53,4 +46,25 @@ khoản admin dùng để test:
 tiết sản phẩm, danh sách/chi tiết danh mục) với vai trò **user** thông thường.
 
 **Sau khi đăng nhập (user thường hoặc admin):** có thể vào mục **"Hồ sơ"** trên navbar để
-cập nhật họ tên, số điện thoại, ảnh đại diện (xem mục 8).
+cập nhật họ tên, số điện thoại, ảnh đại diện.
+
+## Sitemesh Decorator 3 + Template Bootstrap
+ 
+- **Nguồn Template Bootstrap sử dụng:** [Start Bootstrap - Agency](https://startbootstrap.com/theme/agency)
+ 
+| Từ Agency | Áp dụng vào project |
+|---|---|
+| `css/styles.css` | Nạp vào `<head>` của decorator `WEB-INF/decorators/main.jsp` → áp dụng cho **toàn bộ trang** trong site |
+| `js/scripts.js` | Nạp ở cuối `<body>` trong decorator |
+| Favicon gốc của theme | `<link rel="icon">` trong decorator |
+| Bố cục & class `footer | Viết lại phần `<footer>` |
+
+
+
+- Cấu hình mapping: `src/main/webapp/WEB-INF/sitemesh3.xml`
+  - `<mapping path="/*" decorator="/WEB-INF/decorators/main.jsp" />` - áp dụng decorator
+    dùng chung cho toàn bộ ứng dụng.
+    
+- Decorator: `src/main/webapp/WEB-INF/decorators/main.jsp` - dùng Template
+  **Start Bootstrap - Agency**, đồng
+  thời `<jsp:include>` navbar động sẵn có (`views/common/navbar.jsp`) để giữ nguyên logic cũ.
