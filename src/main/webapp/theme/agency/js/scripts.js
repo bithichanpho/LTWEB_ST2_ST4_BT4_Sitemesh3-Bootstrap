@@ -8,6 +8,16 @@
 // 
 
 window.addEventListener('DOMContentLoaded', event => {
+    var setNavHeight = function () {
+        const navbarCollapsible = document.body.querySelector('#mainNav');
+        if (!navbarCollapsible) {
+            return;
+        }
+        document.documentElement.style.setProperty(
+            '--nav-height',
+            navbarCollapsible.offsetHeight + 'px'
+        );
+    };
 
     // Navbar shrink function
     var navbarShrink = function () {
@@ -21,13 +31,20 @@ window.addEventListener('DOMContentLoaded', event => {
             navbarCollapsible.classList.add('navbar-shrink')
         }
 
+        setNavHeight();
     };
 
-    // Shrink the navbar 
     navbarShrink();
+    setNavHeight();
 
     // Shrink the navbar when page is scrolled
     document.addEventListener('scroll', navbarShrink);
+
+    // Đo lại khi thay đổi kích thước cửa sổ (đổi breakpoint / xuống dòng nav)
+    window.addEventListener('resize', setNavHeight);
+
+    document.body.querySelector('#mainNav') &&
+        document.body.querySelector('#mainNav').addEventListener('transitionend', setNavHeight);
 
     //  Activate Bootstrap scrollspy on the main nav element
     const mainNav = document.body.querySelector('#mainNav');

@@ -1,183 +1,132 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+
+<c:set var="uri" value="${pageContext.request.servletPath}" />
+
 <style>
-    * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; }
-
-    .navbar {
-        background: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 22px 40px;
-        border-bottom: 1px solid #eee;
-        font-family: 'Helvetica Neue', Arial, sans-serif;
+    #mainNav .dropdown-menu {
+        border: none;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, .15);
     }
-
-    .nav-left, .nav-right {
-        display: flex;
-        align-items: center;
-        gap: 26px;
-        flex: 1;
+    #mainNav .dropdown-item:hover,
+    #mainNav .dropdown-item:focus {
+        background-color: #fff8e1;
+        color: #212529;
     }
-
-    .nav-right { justify-content: flex-end; }
-
-    .navbar a {
-        text-decoration: none;
-        color: #1a1a1a;
-        font-size: 13px;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        font-weight: 600;
-        transition: color .15s;
-        white-space: nowrap;
+    #mainNav .badge-count {
+        font-weight: 400;
+        font-size: 11px;
     }
-
-    .navbar a:hover { color: #777; }
-
-    .logo {
-        font-size: 26px;
-        font-weight: 800;
-        letter-spacing: 4px;
-        text-transform: uppercase;
-        text-align: center;
-        color: #1a1a1a;
+    #mainNav .navbar-avatar {
+        width: 26px;
+        height: 26px;
+        object-fit: cover;
     }
-
-    .user-info {
-        font-size: 13px;
-        color: #1a1a1a;
-        text-transform: none;
-        font-weight: normal;
-        white-space: nowrap;
-    }
-
-    .nav-item { position: relative; display: inline-block; }
-
-    .nav-dropdown {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        min-width: 260px;
-        padding-top: 10px; /* vùng đệm vô hình, vẫn tính là hover */
-        z-index: 100;
-    }
-
-    .nav-item:hover .nav-dropdown,
-    .nav-dropdown:hover { display: block; }
-
-    .nav-dropdown-inner {
-        background: #fff;
-        border-radius: 4px;
-        box-shadow: 0 8px 20px rgba(0,0,0,.12);
-
-    }
-
-    .nav-dropdown-inner > *:first-child { border-top-left-radius: 4px; border-top-right-radius: 4px; }
-    .nav-dropdown-inner > *:last-child { border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; }
-
-    .nav-dropdown a,
-    .nav-dropdown .nav-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        color: #1a1a1a;
-        padding: 12px 18px;
-        margin: 0;
-        font-weight: normal;
-        font-size: 13px;
-        text-transform: none;
-        letter-spacing: normal;
-        border-bottom: 1px solid #f0f0f0;
-    }
-
-    .nav-dropdown a:last-child,
-    .nav-dropdown .nav-row:last-child { border-bottom: none; }
-    .nav-dropdown a:hover { background: #f7f7f7; color: #1a1a1a; }
-    .nav-dropdown .count { color: #999; font-size: 12px; }
-
-    /* --- Menu con cấp 2 (flyout sang phải khi hover "Danh mục hàng hóa") --- */
-    .nav-subitem { position: relative; }
-    .nav-subitem .nav-row { cursor: default; }
-    .nav-subitem:hover .nav-row { background: #f7f7f7; }
-    .nav-subitem .arrow { color: #bbb; font-size: 11px; margin-left: 8px; }
-
-    .nav-flyout {
-        display: none;
-        position: absolute;
-        left: 100%;
-        top: 0;
-        min-width: 240px;
-        padding-left: 10px; /* vùng đệm vô hình theo chiều ngang, giữ hover liên tục */
-        z-index: 110;
-    }
-
-    .nav-subitem:hover .nav-flyout,
-    .nav-flyout:hover { display: block; }
-
-    .nav-flyout-inner {
-        background: #fff;
-        border-radius: 4px;
-        box-shadow: 0 8px 20px rgba(0,0,0,.12);
-        overflow: hidden;
-    }
-
-    .nav-flyout a {
-        border-bottom: 1px solid #f0f0f0;
-    }
-    .nav-flyout a:last-child { border-bottom: none; }
 </style>
-<nav class="navbar">
-    <div class="nav-left">
-        <a href="${pageContext.request.contextPath}/home">Trang chủ</a>
-        <a href="${pageContext.request.contextPath}/product">Sản phẩm</a>
-        <span class="nav-item">
-            <a href="${pageContext.request.contextPath}/categories">Danh mục ▾</a>
-            <div class="nav-dropdown">
-                <div class="nav-dropdown-inner">
-                    <div class="nav-subitem">
-                        <span class="nav-row">
-                            <span>Danh mục hàng hóa</span>
-                            <span class="arrow">▸</span>
-                        </span>
-                        <div class="nav-flyout">
-                            <div class="nav-flyout-inner">
-                                <c:forEach items="${navCategories}" var="nc">
-                                    <a href="${pageContext.request.contextPath}/category/detail?id=${nc.categoryId}">
-                                        <span>${nc.categoryname}</span>
-                                        <span class="count">${navCategoryCounts[nc.categoryId]} sản phẩm</span>
-                                    </a>
-                                </c:forEach>
-                            </div>
-                        </div>
-                    </div>
-                    <a href="${pageContext.request.contextPath}/product/stock-report">
-                        <span>Thống kê tổng số lượng</span>
-                        <span class="count">${navTotalProducts} sản phẩm</span>
+
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
+
+    <div class="container-fluid px-3 px-lg-4">
+        <a class="navbar-brand" href="${pageContext.request.contextPath}/home">SHOP</a>
+
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
+            aria-label="Toggle navigation">
+            Menu
+            <i class="fas fa-bars ms-1"></i>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0 align-items-lg-center">
+
+                <li class="nav-item">
+                    <a class="nav-link ${uri == '/home' ? 'active' : ''}"
+                        href="${pageContext.request.contextPath}/home">Trang chủ</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link ${fn:startsWith(uri, '/product') ? 'active' : ''}"
+                        href="${pageContext.request.contextPath}/product">Sản phẩm</a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle ${fn:startsWith(uri, '/categor') ? 'active' : ''}"
+                        href="${pageContext.request.contextPath}/categories" id="navCategoryDropdown" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        Danh mục
                     </a>
-                </div>
-            </div>
-        </span>
-        <c:if test="${sessionScope.currentUser.role == 'admin'}">
-            <a href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a>
-        </c:if>
-    </div>
+                    <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="navCategoryDropdown">
+                        <c:forEach items="${navCategories}" var="nc">
+                            <li>
+                                <a class="dropdown-item d-flex justify-content-between align-items-center gap-3"
+                                    href="${pageContext.request.contextPath}/category/detail?id=${nc.categoryId}">
+                                    <span>${nc.categoryname}</span>
+                                    <span class="badge bg-secondary badge-count">${navCategoryCounts[nc.categoryId]} sản phẩm</span>
+                                </a>
+                            </li>
+                        </c:forEach>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item d-flex justify-content-between align-items-center gap-3"
+                                href="${pageContext.request.contextPath}/product/stock-report">
+                                <span>Thống kê tổng số lượng</span>
+                                <span class="badge bg-secondary badge-count">${navTotalProducts} sản phẩm</span>
+                            </a>
+                        </li>
 
-    <div class="logo">Shop</div>
+                        <c:if test="${sessionScope.currentUser.role == 'admin'}">
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item ${uri == '/admin/products' ? 'active' : ''}"
+                                    href="${pageContext.request.contextPath}/admin/products">
+                                    Quản lý sản phẩm (Admin)
+                                </a>
+                            </li>
+                        </c:if>
+                    </ul>
+                </li>
 
-    <div class="nav-right">
-        <c:choose>
-            <c:when test="${not empty sessionScope.currentUser}">
-                <span class="user-info">Xin chào, <b>${sessionScope.currentUser.fullname}</b></span>
-                <a href="${pageContext.request.contextPath}/profile">Hồ sơ</a>
-                <a href="${pageContext.request.contextPath}/logout">Đăng xuất</a>
-            </c:when>
-            <c:otherwise>
-                <a href="${pageContext.request.contextPath}/login">Đăng nhập</a>
-                <a href="${pageContext.request.contextPath}/register">Đăng ký</a>
-            </c:otherwise>
-        </c:choose>
+                <c:if test="${sessionScope.currentUser.role == 'admin'}">
+                    <li class="nav-item">
+                        <a class="nav-link ${fn:startsWith(uri, '/admin') ? 'active' : ''}"
+                            href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a>
+                    </li>
+                </c:if>
+
+                <c:choose>
+                    <c:when test="${not empty sessionScope.currentUser}">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 ${uri == '/profile' ? 'active' : ''}"
+                                href="#" id="navUserDropdown" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                <c:if test="${not empty sessionScope.currentUser.avatar}">
+                                    <img class="rounded-circle navbar-avatar"
+                                        src="${pageContext.request.contextPath}/image/${sessionScope.currentUser.avatar}"
+                                        alt="Avatar">
+                                </c:if>
+                                <span>${sessionScope.currentUser.fullname}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="navUserDropdown">
+                                <li><a class="dropdown-item" href="${pageContext.request.contextPath}/profile">Hồ sơ</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="${pageContext.request.contextPath}/logout">Đăng xuất</a></li>
+                            </ul>
+                        </li>
+                    </c:when>
+                    <c:otherwise>
+                        <li class="nav-item">
+                            <a class="nav-link ${uri == '/login' ? 'active' : ''}"
+                                href="${pageContext.request.contextPath}/login">Đăng nhập</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-primary btn-sm ms-lg-2"
+                                href="${pageContext.request.contextPath}/register">Đăng ký</a>
+                        </li>
+                    </c:otherwise>
+                </c:choose>
+
+            </ul>
+        </div>
     </div>
 </nav>

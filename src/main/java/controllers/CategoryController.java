@@ -1,12 +1,7 @@
 package controllers;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +22,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
+import utils.ImageStorageUtil;
 import utils.ValidationUtil;
 
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 5 * 5)
@@ -144,10 +140,6 @@ public class CategoryController extends HttpServlet {
 
         String url = req.getRequestURI();
 
-        String uploadPath = req.getServletContext().getRealPath(AppConfig.ROOT_UPLOAD_DIR + "/categories");
-        File uploadDir = new File(uploadPath);
-        if (!uploadDir.exists()) uploadDir.mkdirs();
-
         if (url.contains("insert")) {
             String name = req.getParameter("categoryname");
             String statusStr = req.getParameter("status");
@@ -188,11 +180,7 @@ public class CategoryController extends HttpServlet {
             if (part != null && part.getSize() > 0) {
                 String originalFileName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
                 String fileName = System.currentTimeMillis() + "_" + originalFileName;
-                Path path = Paths.get(uploadPath, fileName);
-                try (InputStream inputStream = part.getInputStream()) {
-                    Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-                }
-                dbImageValue = CATEGORY_IMG_FOLDER + "/" + fileName;
+                dbImageValue = ImageStorageUtil.store(part, CATEGORY_IMG_FOLDER, fileName);
             }
 
             Category category = new Category();
@@ -243,11 +231,7 @@ public class CategoryController extends HttpServlet {
             if (part != null && part.getSize() > 0) {
                 String originalFileName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
                 String fileName = System.currentTimeMillis() + "_" + originalFileName;
-                Path path = Paths.get(uploadPath, fileName);
-                try (InputStream inputStream = part.getInputStream()) {
-                    Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-                }
-                category.setImages(CATEGORY_IMG_FOLDER + "/" + fileName);
+                category.setImages(ImageStorageUtil.store(part, CATEGORY_IMG_FOLDER, fileName));
             } else {
                 Category oldCate = categoryDao.findById(id);
                 category.setImages(oldCate.getImages());

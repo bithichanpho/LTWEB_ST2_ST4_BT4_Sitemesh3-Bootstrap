@@ -19,6 +19,13 @@ body {
 	background: #fff;
 }
 
+.hero {
+	margin-top: calc(-1 * var(--nav-height, 72px));
+}
+@media (min-width: 992px) {
+	#mainNav:not(.navbar-shrink) { background-color: transparent !important; }
+}
+
 /* Hero */
 .hero {
 	position: relative;

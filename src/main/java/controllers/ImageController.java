@@ -31,10 +31,30 @@ public class ImageController extends HttpServlet {
 		// Chuan hoa, bo dau "/" dau tien
 		relativePath = relativePath.replaceFirst("^/", "");
 
+		// Uu tien tim trong thu muc luu upload ben ngoai (persistent, khong
+		// bi mat khi Clean/publish lai server) - xem giai thich trong AppConfig.
+		File externalRoot = new File(AppConfig.EXTERNAL_UPLOAD_DIR);
+		Path externalFilePath = Paths.get(AppConfig.EXTERNAL_UPLOAD_DIR, relativePath.split("/"));
+		File file = externalFilePath.toFile();
+
+		if (file.exists() && file.isFile()) {
+			String externalRootCanonical = externalRoot.getCanonicalPath();
+			String fileCanonical = file.getCanonicalPath();
+			if (!fileCanonical.startsWith(externalRootCanonical)) {
+				resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+				return;
+			}
+			serveFile(resp, externalFilePath, file);
+			return;
+		}
+
+		// Khong co trong thu muc upload ngoai -> fallback ve thu muc webapp
+		// (anh mau co san duoc dong goi cung source, vd cac san pham/category
+		// khoi tao ban dau).
 		String realRootDir = req.getServletContext().getRealPath(AppConfig.ROOT_UPLOAD_DIR);
 
 		Path filePath = Paths.get(realRootDir, relativePath.split("/"));
-		File file = filePath.toFile();
+		file = filePath.toFile();
 
 		// Chan path traversal (vd: ../../etc/passwd)
 		String rootCanonical = new File(realRootDir).getCanonicalPath();
@@ -49,6 +69,10 @@ public class ImageController extends HttpServlet {
 			return;
 		}
 
+		serveFile(resp, filePath, file);
+	}
+
+	private void serveFile(HttpServletResponse resp, Path filePath, File file) throws IOException {
 		String mimeType = Files.probeContentType(filePath);
 		resp.setContentType(mimeType != null ? mimeType : "application/octet-stream");
 		resp.setContentLengthLong(file.length());

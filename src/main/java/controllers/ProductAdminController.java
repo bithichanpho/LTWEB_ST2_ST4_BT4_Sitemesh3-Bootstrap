@@ -1,12 +1,7 @@
 package controllers;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +20,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
+import utils.ImageStorageUtil;
 import utils.ValidationUtil;
 
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, maxRequestSize = 1024 * 1024 * 5 * 5)
@@ -98,9 +94,6 @@ public class ProductAdminController extends HttpServlet {
 		resp.setCharacterEncoding("UTF-8");
 		String url = req.getRequestURI();
 		
-		String uploadPath = req.getServletContext().getRealPath(AppConfig.ROOT_UPLOAD_DIR + "/products");		File uploadDir = new File(uploadPath);
-		if (!uploadDir.exists()) uploadDir.mkdirs();
-		
 		if (url.contains("insert")) {
 			String name = req.getParameter("productName");
 			String priceStr = req.getParameter("price");
@@ -148,11 +141,9 @@ public class ProductAdminController extends HttpServlet {
 				if (part != null && part.getSize() > 0) {
 					String originalFileName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
 					String fileName = System.currentTimeMillis() + "_" + originalFileName;
-					Path path = Paths.get(uploadPath, fileName);
-					try (InputStream inputStream = part.getInputStream()) {
-						Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-					}
-					dbImageValue = "products/" + fileName; 
+					// Luu file vao thu muc external (persistent) va dong thoi copy vao
+					// src/main/webapp/image/products de commit len Git - xem ImageStorageUtil.
+					dbImageValue = ImageStorageUtil.store(part, "products", fileName);
  				}
 				
 				Category category = categoryDao.findById(categoryId);
@@ -164,6 +155,9 @@ public class ProductAdminController extends HttpServlet {
 				product.setDescription(description);
 				product.setImages(dbImageValue);
 				product.setCategory(category);
+				// Trước đây không set trường này -> Hibernate insert NULL cho createdAt
+				// mỗi lần thêm sản phẩm mới.
+				product.setCreatedAt(java.time.LocalDateTime.now());
 				
 				productDao.insert(product);
 				resp.sendRedirect(req.getContextPath() + "/admin/products");
@@ -221,11 +215,7 @@ public class ProductAdminController extends HttpServlet {
 				if (part != null && part.getSize() > 0) {
 					String originalFileName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
 					String fileName = System.currentTimeMillis() + "_" + originalFileName;
-					Path path = Paths.get(uploadPath, fileName);
-					try (InputStream inputStream = part.getInputStream()) {
-						Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-					}
-					product.setImages("products/" + fileName);
+					product.setImages(ImageStorageUtil.store(part, "products", fileName));
 				} else {
 					product.setImages(oldProduct != null ? oldProduct.getImages() : "");
 				}

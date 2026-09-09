@@ -9,7 +9,7 @@
 <meta charset="UTF-8">
 <title>Quản lý Product</title>
 <style>
-body {
+.pm-wrap {
 	font-family: Arial, sans-serif;
 	margin: 20px;
 }
@@ -71,11 +71,9 @@ img {
 </head>
 
 <body>
-    <!-- NẾU BẠN CÓ NAVBAR CHUNG, BỎ COMMENT DÒNG DƯỚI ĐỂ INCLUDE VÀO (sửa lại đúng đường dẫn) -->
+	<div class="pm-wrap">
 
 	<h2>Quản lý Product</h2>
-
-    <!-- Các nút thao tác -->
     <div>
         <a href="${pageContext.request.contextPath}/categories" class="btn-back">← Quay lại danh sách Category</a>
         <a href="${pageContext.request.contextPath}/admin/product/add" class="btn-add">+ Thêm Product mới</a>
@@ -117,6 +115,8 @@ img {
 			</c:forEach>
 		</tbody>
 	</table>
+
+	</div>
 </body>
 
 </html>

@@ -10876,9 +10876,12 @@ p {
 }
 
 #mainNav {
-  padding-top: 1rem;
-  padding-bottom: 1rem;
   background-color: #212529;
+  /* Chiều cao navbar cố định 72px, không phụ thuộc padding/margin/border
+     hay font-size của brand/nav-link nữa (kể cả ở trạng thái navbar-shrink),
+     nên luôn nhất quán ở mọi kích thước màn hình. */
+  height: 72px;
+  padding: 0;
 }
 #mainNav .navbar-toggler {
   padding: 0.75rem;
@@ -10909,11 +10912,9 @@ p {
 
 @media (min-width: 992px) {
   #mainNav {
-    padding-top: 1.5rem;
-    padding-bottom: 1.5rem;
     border: none;
     background-color: transparent;
-    transition: padding-top 0.3s ease-in-out, padding-bottom 0.3s ease-in-out;
+    transition: background-color 0.3s ease-in-out;
   }
   #mainNav .navbar-brand {
     font-size: 1.5em;
@@ -10924,8 +10925,6 @@ p {
     transition: height 0.3s ease-in-out;
   }
   #mainNav.navbar-shrink {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
     background-color: #212529;
   }
   #mainNav.navbar-shrink .navbar-brand {

@@ -1,15 +1,9 @@
 package controllers;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.Map;
 
-import configs.AppConfig;
 import dao.IUserDao;
 import dao.impl.UserDao;
 import dto.ProfileForm;
@@ -22,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
+import utils.ImageStorageUtil;
 import utils.ValidationUtil;
 
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 5 * 5)
@@ -95,19 +90,11 @@ public class ProfileController extends HttpServlet {
 		}
 
 		try {
-			String uploadPath = req.getServletContext().getRealPath(AppConfig.ROOT_UPLOAD_DIR + "/" + AVATAR_FOLDER);
-			File uploadDir = new File(uploadPath);
-			if (!uploadDir.exists()) uploadDir.mkdirs();
-
 			Part part = req.getPart("avatar");
 			if (part != null && part.getSize() > 0) {
 				String originalFileName = Paths.get(part.getSubmittedFileName()).getFileName().toString();
 				String fileName = System.currentTimeMillis() + "_" + originalFileName;
-				Path path = Paths.get(uploadPath, fileName);
-				try (InputStream inputStream = part.getInputStream()) {
-					Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-				}
-				user.setAvatar(AVATAR_FOLDER + "/" + fileName);
+				user.setAvatar(ImageStorageUtil.store(part, AVATAR_FOLDER, fileName));
 			}
 			// Nếu không chọn ảnh mới thì giữ nguyên avatar cũ (user.getAvatar() đã có sẵn từ findById)
 
