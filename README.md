@@ -44,27 +44,3 @@ khoản admin dùng để test:
 
 **Nếu không đăng nhập:** trang web chỉ cho phép **xem** dữ liệu (trang chủ, danh sách/chi
 tiết sản phẩm, danh sách/chi tiết danh mục) với vai trò **user** thông thường.
-
-**Sau khi đăng nhập (user thường hoặc admin):** có thể vào mục **"Hồ sơ"** trên navbar để
-cập nhật họ tên, số điện thoại, ảnh đại diện.
-
-## Sitemesh Decorator 3 + Template Bootstrap
- 
-- **Nguồn Template Bootstrap sử dụng:** [Start Bootstrap - Agency](https://startbootstrap.com/theme/agency)
- 
-| Từ Agency | Áp dụng vào project |
-|---|---|
-| `css/styles.css` | Nạp vào `<head>` của decorator `WEB-INF/decorators/main.jsp` → áp dụng cho **toàn bộ trang** trong site |
-| `js/scripts.js` | Nạp ở cuối `<body>` trong decorator |
-| Favicon gốc của theme | `<link rel="icon">` trong decorator |
-| Bố cục & class `footer | Viết lại phần `<footer>` |
-
-
-
-- Cấu hình mapping: `src/main/webapp/WEB-INF/sitemesh3.xml`
-  - `<mapping path="/*" decorator="/WEB-INF/decorators/main.jsp" />` - áp dụng decorator
-    dùng chung cho toàn bộ ứng dụng.
-    
-- Decorator: `src/main/webapp/WEB-INF/decorators/main.jsp` - dùng Template
-  **Start Bootstrap - Agency**, đồng
-  thời `<jsp:include>` navbar động sẵn có (`views/common/navbar.jsp`) để giữ nguyên logic cũ.
